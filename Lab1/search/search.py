@@ -96,13 +96,14 @@ def breadthFirstSearch(problem: SearchProblem):
 
     nodeQueue = util.Queue()
     visitedStates = set()
+
     startState = problem.getStartState()
+    visitedStates.add(startState)
     nodeQueue.push(Node(startState))
 
     while not nodeQueue.isEmpty():
 
         node = nodeQueue.pop()
-        visitedStates.add(node.state)
 
         if problem.isGoalState(node.state):
             print(node.buildPath())
@@ -110,6 +111,7 @@ def breadthFirstSearch(problem: SearchProblem):
         
         for successor in problem.getSuccessors(node.state):
             if not successor[0] in visitedStates:
+                visitedStates.add(successor[0])
                 nodeQueue.push(Node(successor[0], node, successor[1]))
 
     util.raiseNotDefined()
