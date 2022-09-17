@@ -17,7 +17,9 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from tkinter import N
 import util
+from game import Directions
 
 class SearchProblem:
     """
@@ -67,7 +69,6 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
-    from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
@@ -92,6 +93,25 @@ def depthFirstSearch(problem: SearchProblem):
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+
+    nodeQueue = util.Queue()
+    visitedStates = set()
+    startState = problem.getStartState()
+    nodeQueue.push(Node(startState))
+
+    while not nodeQueue.isEmpty():
+
+        node = nodeQueue.pop()
+        visitedStates.add(node.state)
+
+        if problem.isGoalState(node.state):
+            print(node.buildPath())
+            return node.buildPath()
+        
+        for successor in problem.getSuccessors(node.state):
+            if not successor[0] in visitedStates:
+                nodeQueue.push(Node(successor[0], node, successor[1]))
+
     util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem):
@@ -111,6 +131,27 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+
+class Node:
+
+    def __init__(self, state, parent=None, direction=None):
+
+        self.state = state
+        self.parent = parent
+        self.direction = direction
+
+    def buildPath(self):
+        path = []
+        node = self
+
+        #Build actions path from the start to end in reversed order.
+        while node.parent != None:
+            path.append(node.direction)
+            node = node.parent
+
+        path.reverse()
+
+        return path
 
 # Abbreviations
 bfs = breadthFirstSearch
