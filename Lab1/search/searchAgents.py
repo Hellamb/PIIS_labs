@@ -299,14 +299,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return (self.startingPosition, self.corners)
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        corners = state[1]
+        return len(corners) == 0
 
     def getSuccessors(self, state: Any):
         """
@@ -330,6 +333,19 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
 
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            nextPosition = (nextx, nexty)
+
+            if not self.walls[nextx][nexty]:
+                corners = list(state[1]).copy()
+
+                if nextPosition in corners:
+                    corners.remove(nextPosition)
+
+                successors.append(((nextPosition, tuple(corners)), action, 1))
+
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -338,13 +354,16 @@ class CornersProblem(search.SearchProblem):
         Returns the cost of a particular sequence of actions.  If those actions
         include an illegal move, return 999999.  This is implemented for you.
         """
-        if actions == None: return 999999
-        x,y= self.startingPosition
+        x,y= self.getStartState()[0]
+        cost = 0
         for action in actions:
+            # figure out the next state and see whether it's legal
             dx, dy = Actions.directionToVector(action)
             x, y = int(x + dx), int(y + dy)
-            if self.walls[x][y]: return 999999
-        return len(actions)
+            if self.walls[x][y]:
+                return 999999
+            cost += 1
+        return cost
 
 
 def cornersHeuristic(state: Any, problem: CornersProblem):
@@ -461,7 +480,7 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     distances = []
     for foodPosition in foodGrid.asList():
         distances.append(mazeDistance(position, foodPosition, problem.startingGameState))
-        
+
     if len(distances) > 0:
         return max(distances)
     else:
