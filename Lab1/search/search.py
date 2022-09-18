@@ -114,8 +114,6 @@ def breadthFirstSearch(problem: SearchProblem):
                 visitedStates.add(successor[0])
                 nodeQueue.push(Node(successor[0], node, successor[1]))
 
-    util.raiseNotDefined()
-
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
@@ -131,16 +129,39 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    nodeQueue = util.PriorityQueue()
+    visitedStates = set()
+
+    startState = problem.getStartState()
+    visitedStates.add(startState)
+    nodeQueue.push(Node(startState),0)
+
+    while not nodeQueue.isEmpty():
+
+        node = nodeQueue.pop()
+
+        if problem.isGoalState(node.state):
+            return node.buildPath()
+        
+        for successor in problem.getSuccessors(node.state):
+            if not successor[0] in visitedStates:
+                visitedStates.add(successor[0])
+
+                newNode = Node(successor[0], node, successor[1], node.cost+successor[2])
+                priority = heuristic(newNode.state, problem)+newNode.cost
+
+                nodeQueue.push(newNode, priority)
 
 
 class Node:
 
-    def __init__(self, state, parent=None, direction=None):
+    def __init__(self, state, parent=None, direction=None, cost=0):
 
         self.state = state
         self.parent = parent
         self.direction = direction
+        self.cost = cost
 
     def buildPath(self):
         path = []
