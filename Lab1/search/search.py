@@ -121,10 +121,22 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     nodeAcceptor = lambda node, successor:(
             nodeQueue.push(
                 Node(successor[0], node, successor[1], node.cost+successor[2]), #New node
-                heuristic(successor[0], problem)+node.cost+successor[2]) #New node priority
+                heuristic(successor[0], problem)+node.cost+successor[2]) #New node priority, include heuristic and path cost
         )
     
     return abstractSearch(problem, nodeQueue, nodeAcceptor)
+
+def greedAStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
+
+    nodeQueue = util.PriorityQueue()
+    nodeQueue.push(Node(problem.getStartState()),0)
+    nodeAcceptor = lambda node, successor:(
+            nodeQueue.push(
+                Node(successor[0], node, successor[1], node.cost+successor[2]), #New node
+                heuristic(successor[0], problem)) #New node priority, include only heuristic
+        )
+    
+    return abstractSearch(problem, nodeQueue, nodeAcceptor)    
 
 def abstractSearch(problem: SearchProblem, nodeSupplier, nodeAcceptor):
     visitedStates = set()
@@ -173,3 +185,4 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+gastar = greedAStarSearch
