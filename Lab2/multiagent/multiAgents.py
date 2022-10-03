@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from math import inf
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -75,7 +76,24 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        #Run from ghosts
+        ghostPositions = successorGameState.getGhostPositions()
+        for ghostPosition in ghostPositions:
+            if manhattanDistance(newPos, ghostPosition) < 2: return -inf
+
+        #Eat food
+        numFood = currentGameState.getNumFood()
+        newNumFood = successorGameState.getNumFood()
+        if newNumFood < numFood: return 100000
+
+        #Search nearest food
+        min_distance = inf
+        for food in newFood.asList():
+            distance = manhattanDistance(newPos, food)
+            min_distance = min(min_distance, distance)
+
+        return 1/min_distance
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
