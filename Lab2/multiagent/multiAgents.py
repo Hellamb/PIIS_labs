@@ -154,25 +154,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        def miniMax(state: GameState):
-
-            actions = state.getLegalActions(self.index)
-            nextAction = actions[0]
-            maxValue = -inf
-
-            for action in actions: #First-depth variants expanding
-                successor = state.generateSuccessor(self.index, action)
-                value = getMin(successor, self.index + 1, 0)
-
-                if value > maxValue:#Choose best of worst
-                    maxValue = value
-                    nextAction = action
-
-            return nextAction
-
-
-        def getMin(state: GameState, agentIndex, depth): #Find worst ghosts choices
-            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+        def getMinValue(state: GameState, agentIndex, depth): #Find worst ghosts choices
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
                 return self.evaluationFunction(state)
 
             minValue = inf
@@ -182,28 +165,40 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 successor = state.generateSuccessor(agentIndex, action)
 
                 if agentIndex < gameState.getNumAgents() - 1:
-                    minValue = min(minValue, getMin(successor, agentIndex + 1, depth)) #Run every ghost
+                    minValue = min(minValue, getMinValue(successor, agentIndex + 1, depth)) #Run every ghost
                 else:
-                    minValue = min(minValue, getMax(successor, depth + 1)) #Run pacman after all ghosts
+                    minValue = min(minValue, getMaxValue(successor, depth + 1)) #Run pacman after all ghosts
 
             return minValue
 
 
-        def getMax(state: GameState, depth): #Find best pacman choice
-            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+        def getMaxValue(state: GameState, depth): #Find best pacman choice
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
                 return self.evaluationFunction(state)
 
             maxValue = -inf
             actions = state.getLegalActions(0)
 
             for action in actions: #Variants expanding
-                successor = state.generateSuccessor(self,index, action)
-                maxValue = max(maxValue, getMin(successor, 1, depth))
+                successor = state.generateSuccessor(self.index, action)
+                maxValue = max(maxValue, getMinValue(successor, 1, depth))
 
             return maxValue    
 
 
-        return miniMax(gameState)
+        maxValue = -inf
+        actions = gameState.getLegalActions(self.index)
+        bestAction = actions[0]
+
+        for action in actions: #First-depth variants expanding
+            successor = gameState.generateSuccessor(self.index, action)
+            value = getMinValue(successor, self.index + 1, 0)
+
+            if value > maxValue:
+                maxValue = value
+                bestAction = action
+
+        return bestAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
