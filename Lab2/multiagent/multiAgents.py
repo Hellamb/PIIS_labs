@@ -211,7 +211,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def getMinValue(state: GameState, agentIndex, depth, alpha, beta): #Find worst ghosts choices
-            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
                 return self.evaluationFunction(state)
 
             minValue = inf
@@ -232,7 +232,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return minValue
 
         def getMaxValue(state: GameState, depth, alpha, beta): #Find best pacman choice
-            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
                 return self.evaluationFunction(state)
 
             maxValue = -inf
