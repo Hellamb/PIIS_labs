@@ -210,7 +210,57 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def getMinValue(state: GameState, agentIndex, depth, alpha, beta): #Find worst ghosts choices
+            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+                return self.evaluationFunction(state)
+
+            minValue = inf
+            actions = state.getLegalActions(agentIndex)
+
+            for action in actions: #Variants expanding
+                successor = state.generateSuccessor(agentIndex, action)
+
+                if agentIndex < gameState.getNumAgents()- 1:
+                    minValue = min(minValue, getMinValue(successor, agentIndex + 1, depth, alpha, beta))
+                else:
+                    minValue = min(minValue, getMaxValue(successor, depth + 1, alpha, beta))
+
+                if minValue < alpha:#Pruning condition
+                    break
+                beta = min(beta, minValue)
+
+            return minValue
+
+        def getMaxValue(state: GameState, depth, alpha, beta): #Find best pacman choice
+            if (depth == self.depth) or state.isWin() or state.isLose(): #Exit condition
+                return self.evaluationFunction(state)
+
+            maxValue = -inf
+            actions = state.getLegalActions(0)
+
+            for action in actions:
+                successor = state.generateSuccessor(0, action)
+                maxValue = max(maxValue, getMinValue(successor, 1, depth, alpha, beta))
+
+                if maxValue > beta: #Pruning condition
+                    break
+                alpha = max(alpha, maxValue)
+
+            return maxValue
+
+        maxValue = -inf
+        actions = gameState.getLegalActions(self.index)
+        bestAction = actions[0]
+
+        for action in actions:  #First-depth variants expanding
+            successor = gameState.generateSuccessor(self.index, action)
+            value = getMinValue(successor, self.index + 1, 0, maxValue, inf)
+
+            if value > maxValue:
+                maxValue = value
+                bestAction = action
+
+        return bestAction
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
