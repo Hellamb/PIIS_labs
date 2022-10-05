@@ -275,7 +275,51 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def getExpectedValue(state: GameState, agentIndex, depth): #Find worst ghosts choices
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
+                return self.evaluationFunction(state)
+
+            values = 0
+            actions = state.getLegalActions(agentIndex)
+
+            for action in actions: #Variants expanding
+                successor = state.generateSuccessor(agentIndex, action)
+
+                if agentIndex < gameState.getNumAgents() - 1:
+                    values += getExpectedValue(successor, agentIndex + 1, depth) #Run every ghost
+                else:
+                    values += getMaxValue(successor, depth + 1) #Run pacman after all ghosts
+
+            return values/gameState.getNumAgents()
+
+
+        def getMaxValue(state: GameState, depth): #Find best pacman choice
+            if depth == self.depth or state.isWin() or state.isLose(): #Exit condition
+                return self.evaluationFunction(state)
+
+            maxValue = -inf
+            actions = state.getLegalActions(0)
+
+            for action in actions: #Variants expanding
+                successor = state.generateSuccessor(self.index, action)
+                maxValue = max(maxValue, getExpectedValue(successor, 1, depth))
+
+            return maxValue    
+
+
+        maxValue = -inf
+        actions = gameState.getLegalActions(self.index)
+        bestAction = actions[0]
+
+        for action in actions: #First-depth variants expanding
+            successor = gameState.generateSuccessor(self.index, action)
+            value = getExpectedValue(successor, self.index + 1, 0)
+
+            if value > maxValue:
+                maxValue = value
+                bestAction = action
+
+        return bestAction
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
