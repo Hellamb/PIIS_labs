@@ -4,8 +4,8 @@ import time
 
 chessEngine = chess.engine.SimpleEngine.popen_uci(r"stockfish_15_win_x64_avx2\stockfish_15_x64_avx2.exe")
 
-def evaluate(board_instance, isMax):
-    info = chessEngine.analyse(board_instance, chess.engine.Limit(depth=1))
+def evaluate(board, isMax):
+    info = chessEngine.analyse(board, chess.engine.Limit(depth=1))
     side =  (chess.BLACK, chess.WHITE)[isMax]
     result = chess.engine.PovScore(info['score'], side).pov(side).relative.score()
     return (result, 0)[result is None]
@@ -33,12 +33,12 @@ def negaScout(board, depth, alpha, beta):
         move = chess.Move.from_uci(str(move))
         newBoard = board.copy()
         newBoard.push(move)
-        cur = -negaScout(newBoard, depth - 1, -n, -alpha)
-        if cur > score:
+        current = -negaScout(newBoard, depth - 1, -n, -alpha)
+        if current > score:
             if n == 999999 or depth <= 2:
-                score = cur
+                score = current
             else:
-                score = -negaScout(newBoard, depth - 1, -beta, -cur)
+                score = -negaScout(newBoard, depth - 1, -beta, -current)
         if score > alpha:
             alpha = score
         if alpha >= beta:
@@ -113,7 +113,7 @@ def startComputerGame(algorithm, depth = 1):
     board = chess.Board()
     turnCounter = 0
 
-    while board.is_checkmate() != True and board.is_fivefold_repetition() != True:
+    while not (board.is_checkmate() or board.is_fivefold_repetition()):
         timeAtTurnStart = time.time()
         move = algorithm(board, depth)
         timeAtTurnEnd = time.time()
@@ -129,7 +129,6 @@ def startComputerGame(algorithm, depth = 1):
 
         print("Move:", move)
         print("Turn time:", timeAtTurnEnd - timeAtTurnStart)
-        print("Current turn:", turnCounter)
 
         board.push(move)
         print(board, "\n")
